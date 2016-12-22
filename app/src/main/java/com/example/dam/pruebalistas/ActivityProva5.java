@@ -108,7 +108,10 @@ public class ActivityProva5 extends AppCompatActivity {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            View myView = inflater.inflate(R.layout.llista5_item, parent, false);
+            View myView = convertView;
+            if(myView == null){
+                myView = inflater.inflate(R.layout.llista5_item, parent, false);
+            }
             Product product = catalog.get(position);
 
             TextView tvNom = (TextView) myView.findViewById(R.id.nom);
@@ -122,7 +125,7 @@ public class ActivityProva5 extends AppCompatActivity {
             TextView tvPreu = (TextView) myView.findViewById(R.id.preu);
             float preu = product.getPrice();
             tvPreu.setText(preu + "€");
-            
+
             TextView tvStock = (TextView) myView.findViewById(R.id.stock);
             Boolean stock = product.isInStock();
             if (stock) {
