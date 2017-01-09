@@ -107,9 +107,9 @@ public class ActivityProva5 extends AppCompatActivity {
         }
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View myView = convertView;
             if(myView == null){
+                LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 myView = inflater.inflate(R.layout.llista5_item, parent, false);
             }
             Product product = catalog.get(position);
