@@ -2,30 +2,38 @@ package com.example.dam.pruebalistas;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.media.Image;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.appindexing.Thing;
+import com.google.android.gms.common.api.GoogleApiClient;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 public class ActivityProva5 extends AppCompatActivity {
-    public class Product extends HashMap<String, Object>{
+    public class Product extends HashMap<String, Object> {
         private long id;
         private String name;
         private float price;
         private boolean inStock;
         private int image;
-        public Product(int id, String name, float price, boolean inStock, int image){
+
+        public Product(int id, String name, float price, boolean inStock, int image) {
             this.id = id;
             this.name = name;
             this.price = price;
@@ -33,23 +41,52 @@ public class ActivityProva5 extends AppCompatActivity {
             this.image = image;
         }
 
-        public long getId() {return id;}
-        public void setId(long id) {this.id = id;}
-        public int getImage() {return image;}
-        public void setImage(int image) {this.image = image;}
-        public boolean isInStock() {return inStock;}
-        public void setInStock(boolean inStock) {this.inStock = inStock;}
-        public String getName() {return name;}
-        public void setName(String name) {this.name = name;}
-        public float getPrice() {return price;}
-        public void setPrice(float price) {this.price = price;}
+        public long getId() {
+            return id;
+        }
+
+        public void setId(long id) {
+            this.id = id;
+        }
+
+        public int getImage() {
+            return image;
+        }
+
+        public void setImage(int image) {
+            this.image = image;
+        }
+
+        public boolean isInStock() {
+            return inStock;
+        }
+
+        public void setInStock(boolean inStock) {
+            this.inStock = inStock;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public float getPrice() {
+            return price;
+        }
+
+        public void setPrice(float price) {
+            this.price = price;
+        }
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_prova5);
-        ListView llista5 = (ListView) findViewById(R.id.llista5);
+        Spinner llista5 = (Spinner) findViewById(R.id.llista5);
 
         List<Product> dades = new ArrayList<>();
         dades.add(new Product(1, "Disc dur 1TByte", 70.0f, true, R.drawable.discdur));
@@ -86,54 +123,85 @@ public class ActivityProva5 extends AppCompatActivity {
 //        });
         CatalogAdapter adapter = new CatalogAdapter(this, dades);
         llista5.setAdapter(adapter);
+        llista5.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Toast.makeText(ActivityProva5.this, "Click en "+id, Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                Toast.makeText(ActivityProva5.this, "Click fora", Toast.LENGTH_SHORT).show();
+            }
+
+        });
     }
 
-    public class CatalogAdapter extends BaseAdapter{
+    public class CatalogAdapter extends BaseAdapter {
         private Context context;
         private List<Product> catalog;
-        public CatalogAdapter(Context context, List<Product> catalog){
+
+        public CatalogAdapter(Context context, List<Product> catalog) {
             this.context = context;
             this.catalog = catalog;
         }
+
         @Override
-        public int getCount() { return catalog.size() ;}
+        public int getCount() {
+            return catalog.size();
+        }
+
         @Override
-        public Object getItem(int position) { return catalog.get(position); }
+        public Object getItem(int position) {
+            return catalog.get(position);
+        }
+
         @Override
         public long getItemId(int position) {
             Product p = catalog.get(position);
             long id = p.getId();
             return id;
         }
+
+        public class ViewHolder {
+            public TextView tvNom;
+            public ImageView myImage;
+            public TextView tvPreu;
+            public TextView tvStock;
+        }
+
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             View myView = convertView;
-            if(myView == null){
+            if (myView == null) {
                 LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 myView = inflater.inflate(R.layout.llista5_item, parent, false);
+                ViewHolder holder = new ViewHolder();
+                holder.tvNom = (TextView) myView.findViewById(R.id.nom);
+                holder.myImage = (ImageView) myView.findViewById(R.id.imatge);
+                holder.tvPreu = (TextView) myView.findViewById(R.id.preu);
+                holder.tvStock = (TextView) myView.findViewById(R.id.stock);
+                myView.setTag(holder);
             }
+            ViewHolder holder = (ViewHolder) myView.getTag();
             Product product = catalog.get(position);
 
-            TextView tvNom = (TextView) myView.findViewById(R.id.nom);
             String nom = product.getName();
-            tvNom.setText(nom);
+            holder.tvNom.setText(nom);
 
-            ImageView myImage = (ImageView) myView.findViewById(R.id.imatge);
             Integer image = product.getImage();
-            myImage.setImageResource(image);
+            holder.myImage.setImageResource(image);
 
-            TextView tvPreu = (TextView) myView.findViewById(R.id.preu);
             float preu = product.getPrice();
-            tvPreu.setText(preu + "€");
+            holder.tvPreu.setText(preu + "€");
 
-            TextView tvStock = (TextView) myView.findViewById(R.id.stock);
             Boolean stock = product.isInStock();
             if (stock) {
-                tvStock.setText("Disponible");
-                tvStock.setTextColor(Color.GREEN);
-            }else{
-                tvStock.setText("No disponible");
-                tvStock.setTextColor(Color.RED);
+                holder.tvStock.setText("Disponible");
+                holder.tvStock.setTextColor(Color.GREEN);
+            } else {
+                holder.tvStock.setText("No disponible");
+                holder.tvStock.setTextColor(Color.RED);
             }
             return myView;
         }
